@@ -13,7 +13,9 @@ for n in range(N):
 #%%
 xs, ys = numpy.polynomial.hermite_e.hermegauss(deg)
 #%%
-N = 10
+import scipy.stats
+
+N = 5
 
 mu = 0.0
 sigma = 1.0
@@ -22,10 +24,16 @@ efs = []
 for k in range(N):
     efs.append(sigma**k / math.factorial(k))
 
-xs = numpy.linspace(-1.0, 10.0, 100)
+xs = numpy.linspace(-3.0, 3.0, 100)
+ps = scipy.stats.norm.pdf(xs)
 
 ys = []
 for x in xs:
     ys.append(numpy.exp(mu + sigma**2 / 2.0) * sum(numpy.polynomial.hermite_e.hermeval([x], efs)))
 
 plt.plot(xs, ys)
+plt.show()
+plt.plot(ys, ps, 'r--')
+plt.plot(xs, ps, 'g')
+plt.plot(numpy.exp(mu + sigma * xs), ps, 'b')
+plt.show()
