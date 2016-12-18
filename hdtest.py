@@ -175,19 +175,19 @@ za = lambda a : 2.0 * (a - aalpha) / (abeta - aalpha) - 1.0
 
 os.chdir('/home/bbales2/gpc')
 
-import hotdog
+import gpc
 
-reload(hotdog)
+reload(gpc)
 
 minD = 0.5
 maxD = 1.2
 mina = -0.5
 maxa = 0.5
 
-hd = hotdog.GPC(5, solve, [('u', (minD, maxD), 5),
-                           ('n', (0.0, 0.2), 5)])
+hd = gpc.GPC(7, solve, [('u', (minD, maxD), 5),
+                        ('n', (0.0, 0.5), 5)])
 #%%
-mn = 0.1
+mn = 0.2
 
 def L(z1, z2):
     logp = 0.0
@@ -200,8 +200,8 @@ def L(z1, z2):
 
 denominator = hd.measure(L)
 
-post = numpy.zeros((40, 30))
-for i, z1 in enumerate(numpy.linspace(minD, maxD, 40)):
+post = numpy.zeros((30, 30))
+for i, z1 in enumerate(numpy.linspace(minD, maxD, 30)):
     for j, z2 in enumerate(numpy.linspace(mina, maxa, 30)):
         post[i, j] = L(z1, z2) * hd.prior(z1, z2) / denominator#
 
@@ -215,9 +215,9 @@ plt.show()
 #%%
 os.chdir('/home/bbales2/gpc')
 
-import hotdog
+import gpc
 
-reload(hotdog)
+reload(gpc)
 
 minD = 0.5
 maxD = 1.2
@@ -226,10 +226,11 @@ maxa = 0.5
 
 solve2 = lambda a : solve(1.0, a)
 
-hd = hotdog.GPC(7, solve2, [('n', (0.0, 0.2), 5)])
+hd = gpc.GPC(3, solve2, [('n', (-0.2, 0.2), 3)])
 
-plt.plot(hd.approx(0.0), 'r')
-plt.plot(solve2(0.0), 'b')
+plt.plot(hd.approx(-0.2), 'r')
+plt.plot(hd.sols[(0.0,)], 'g')
+plt.plot(solve2(-0.2), 'b')
 plt.show()
 
 #%%
@@ -237,7 +238,8 @@ plt.show()
 labels = []
 for z1 in numpy.linspace(minD, maxD, 5):
     z2 = mina
-    plt.plot(hd.approx(z1, z2))
+    plt.plot(hd.approx(z1, z2), 'r')
+    plt.plot(solve(z1, z2), 'b--')
     labels.append("D = {0}, a = {1}".format(z1, z2))
 
 plt.legend(labels)
@@ -246,7 +248,8 @@ plt.show()
 labels = []
 for z2 in numpy.linspace(mina, maxa, 5):
     z1 = maxD
-    plt.plot(hd.approx(z1, z2))
+    plt.plot(hd.approx(z1, z2), 'r')
+    plt.plot(solve(z1, z2), 'b--')
     labels.append("D = {0}, a = {1}".format(z1, z2))
 
 plt.legend(labels)
@@ -258,7 +261,7 @@ plt.plot(at, 'bo')
 plt.plot(solve(0.89, -0.34), 'rx')
 plt.show()
 #%%
-reload(hotdog)
+reload(gpc)
 import scipy.stats
 #deg = 10
 #xh, wh = scipy.special.p_roots(deg)

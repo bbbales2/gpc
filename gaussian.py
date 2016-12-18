@@ -202,6 +202,8 @@ def approx(z):
 
     return u
 #%%
+import scipy.stats
+
 def L(z):
     return numpy.exp(sum(-0.5 * (data - approx(z))**2 / mn**2))
 
