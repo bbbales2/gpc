@@ -105,8 +105,8 @@ for line in data.split('\n')[0::2]:
 
 data = numpy.array(dataList)
 
-xs = numpy.array(data[1:, 0])
-at = numpy.array(data[1:, 1])
+xs = numpy.array(data[:, 0])
+at = numpy.array(data[:, 1])
 
 nxs = numpy.linspace(0.0, max(xs), len(xs))
 at = numpy.interp(nxs, xs, at)
@@ -117,6 +117,9 @@ maxat = max(at)
 
 xs /= max(xs)
 at /= max(at)
+
+xs = xs[1:]
+at = at[1:]
 #%%
 
 N = len(xs)
@@ -184,10 +187,10 @@ maxD = 1.2
 mina = -0.5
 maxa = 0.5
 
-hd = gpc.GPC(7, solve, [('u', (minD, maxD), 5),
-                        ('n', (0.0, 0.5), 5)])
+hd = gpc.GPC(5, solve, [('u', (minD, maxD), 5),
+                        ('u', (mina, maxa), 5)])
 #%%
-mn = 0.2
+mn = 0.25
 
 def L(z1, z2):
     logp = 0.0
@@ -211,6 +214,22 @@ plt.xlabel('a')
 plt.ylabel('D')
 plt.title('Posterior')
 plt.gcf().set_size_inches((12, 8))
+plt.show()
+#%%
+def loss(z):
+    z1 = z[0]
+    z2 = z[1]
+
+    print z1, z2
+
+    return -L(z1, z2) * hd.prior(z1, z2)
+
+res = scipy.optimize.minimize(loss, [0.8, -0.3], bounds = ([minD, maxD - 0.01], [mina, maxa - 0.01]))#
+#%%
+plt.plot(xs, at, 'bo')
+plt.plot(xs, solve(0.89178849, -0.3399514), 'r')
+plt.plot(xs, solve(0.88, 0.0), 'g')
+plt.legend(['data', 'opt', 'maxp'])
 plt.show()
 #%%
 os.chdir('/home/bbales2/gpc')

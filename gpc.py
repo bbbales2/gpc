@@ -65,7 +65,7 @@ class GPC(object):
 
             self.uks.append(u)
 
-    def approx(self, *args):
+    def normed(self, args):
         normed = []
         for v, a in zip(self.vs, args):
             if v[0] == 'u':
@@ -75,6 +75,11 @@ class GPC(object):
                     raise Exception("Parameter value \"{0}\" out of range for variable {1}".format(a, v))
             elif v[0] == 'n':
                 normed.append((a - v[1][0]) / v[1][1])
+
+        return normed
+
+    def approx(self, *args):
+        normed = self.normed(args)
 
         u = numpy.zeros(self.shape)
         for i, ks in enumerate(self.ks):
@@ -90,6 +95,36 @@ class GPC(object):
             u += self.uks[i] * s
 
         return u
+
+    def mean(self):
+        return self.uks[0]
+
+    def covar(self):
+        N = numpy.product(self.shape)
+
+        covar = numpy.zeros(2 * self.shape) #self.shape is a tuple -- 2 * self.shape concatenates two together
+
+        for ii in range(N):
+            iii = numpy.unravel_index(ii, self.shape)
+            for jj in range(N):
+                jjj = numpy.unravel_index(jj, self.shape)
+
+                covar_ = 0.0
+                for i, ks in enumerate(self.ks):
+                    if i == 0:
+                        continue
+
+                    s = 1.0
+                    for v, k in zip(self.vs, ks):
+                        if v[0] == 'u':
+                            s *= 2.0 / (2.0 * k + 1.0)
+                        elif v[0] == 'n':
+                            s *= numpy.sqrt(2 * numpy.pi) * math.factorial(k)
+                    covar_ += self.uks[i][iii] * self.uks[i][jjj] * s
+
+                covar[iii + jjj] = covar_
+
+        return covar
 
     def prior(self, *args):
         p = 1.0

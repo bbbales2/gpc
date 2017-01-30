@@ -200,6 +200,8 @@ def approx(z):
 
         u += uks[k] * s
 
+        print s
+
     return u
 #%%
 import scipy.stats

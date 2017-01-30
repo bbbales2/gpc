@@ -158,8 +158,8 @@ plt.show()
 #%%
 zs = numpy.linspace(0, 5.0, 100)
 
-alpha = 0.6
-beta = 1.0
+alpha = 0.5
+beta = 10.0
 
 D = lambda x : (beta - alpha) * (x + 1.0) / 2.0 + alpha
 
@@ -182,10 +182,10 @@ def laggauss(deg, alpha):
 #%%
 import math
 
-deg = 3
+deg = 5
 xh, wh = scipy.special.p_roots(deg)#numpy.polynomial.laguerre.laggauss(deg)
 
-K = 3
+K = 5
 
 sols = {}
 
@@ -262,7 +262,7 @@ for x, w in zip(xh, wh):
     plt.show()
 denominator /= (1.0 / (beta - alpha))
 
-zs = numpy.linspace(-1.0, 1.0, 100)
+zs = numpy.linspace(-1.0, 1.0, 500)
 post = []
 for z in zs:
     post.append(L(z) * (1.0 / (beta - alpha)) / denominator)
