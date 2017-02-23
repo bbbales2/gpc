@@ -105,8 +105,8 @@ for line in data.split('\n')[0::2]:
 
 data = numpy.array(dataList)
 
-xs = numpy.array(data[:, 0])
-at = numpy.array(data[:, 1])
+xs = numpy.array(data[1:, 0])
+at = numpy.array(data[1:, 1])
 
 nxs = numpy.linspace(0.0, max(xs), len(xs))
 at = numpy.interp(nxs, xs, at)
@@ -117,9 +117,6 @@ maxat = max(at)
 
 xs /= max(xs)
 at /= max(at)
-
-xs = xs[1:]
-at = at[1:]
 #%%
 
 N = len(xs)
@@ -154,7 +151,7 @@ def f(y, t0, D, a):
     return dcdt
 
 def solve(D, a):
-    return scipy.integrate.odeint(f, numpy.zeros(N), [0.0, 0.1], args = (D, a))[1]
+    return scipy.integrate.odeint(f, numpy.zeros(N), [0.0, 0.1], args = (D, a), mxstep = 1000)[1]
 
 plt.plot(solve(1.0, 0.2))
 plt.show()
@@ -182,15 +179,15 @@ import gpc
 
 reload(gpc)
 
-minD = 0.5
-maxD = 1.2
+minD = 0.4
+maxD = 1.4
 mina = -0.5
-maxa = 0.5
+maxa = 1.0
 
-hd = gpc.GPC(5, solve, [('u', (minD, maxD), 5),
-                        ('u', (mina, maxa), 5)])
+hd = gpc.GPC(7, solve, [('u', (minD, maxD), 7),
+                        ('u', (mina, maxa), 7)])
 #%%
-mn = 0.25
+mn = 0.2
 
 def L(z1, z2):
     logp = 0.0
@@ -208,13 +205,16 @@ for i, z1 in enumerate(numpy.linspace(minD, maxD, 30)):
     for j, z2 in enumerate(numpy.linspace(mina, maxa, 30)):
         post[i, j] = L(z1, z2) * hd.prior(z1, z2) / denominator#
 
-plt.imshow(post, interpolation = 'NONE', extent = [mina, maxa, minD, maxD])
+plt.imshow(post, interpolation = 'NONE', extent = [mina, maxa, maxD, minD])
 plt.colorbar()
 plt.xlabel('a')
 plt.ylabel('D')
 plt.title('Posterior')
 plt.gcf().set_size_inches((12, 8))
 plt.show()
+#%%
+plt.plot(hd.approx(0.69, 0.3));
+plt.plot(at);#solve(0.89, 0.3));
 #%%
 def loss(z):
     z1 = z[0]
